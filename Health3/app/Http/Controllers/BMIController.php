@@ -30,19 +30,19 @@ class BMIController extends Controller
         $yob = $request->yob;
         $berat = $request->berat;
         $tinggi= $request->tinggi;
+        $statusBMI= $statusbmi->obes();
 
-
-
+//inisialisasi class
         $statusbmi= new statusbmi($berat, $tinggi);
-        $konsul= new konsul($yob, $statusbmi->obes());
-
+        $konsul= new konsul($yob, $statusBMI);
+        $hobi = explode(',',$hobbies);
+        $hobiLength = count($hobi) - 1;
 
         //inisialisasiClass
         // $bmi = new statusbmi($request->berat, $request->tinggi);
         // $bmihasil = new hitung($berat, $tinggi );
         // $konsultasi = new Konsul($yob, $bmihasil);
-        $hobi = explode(',',$hobbies);
-        $hobiLength = count($hobi) - 1;
+
 
         $data = [
             'bmi' => $statusbmi->bmi(),
