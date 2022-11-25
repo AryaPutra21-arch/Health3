@@ -18,16 +18,6 @@ class BMIController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-
-    }
-
-    /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -35,65 +25,40 @@ class BMIController extends Controller
      */
     public function store(Request $request)
     {
-        //untuk menghitung bmi
-        $a = new konsul($request->berat, $request->tinggi);
-        // $a->bmi();
-        // $a->obes();
+        //inisialisasiVariabel
+        $hobbies= $request->hobi;
+        $yob = $request->yob;
+        $berat = $request->berat;
+        $tinggi= $request->tinggi;
+
+
+
+        $statusbmi= new statusbmi($berat, $tinggi);
+        $konsul= new konsul($yob, $statusbmi->obes());
+
+
+        //inisialisasiClass
+        // $bmi = new statusbmi($request->berat, $request->tinggi);
+        // $bmihasil = new hitung($berat, $tinggi );
+        // $konsultasi = new Konsul($yob, $bmihasil);
+        $hobi = explode(',',$hobbies);
+        $hobiLength = count($hobi) - 1;
+
         $data = [
-            'bmi' => $a->bmi(),
-            'obes' => $a->obes(),
+            'bmi' => $statusbmi->bmi(),
+            'status' => $statusbmi->obes(),
+            'umur' => $konsul->hitungUmur(),
+            'hobi' => $hobi[rand(0, $hobiLength)],
+            'konsultasi' => $konsul->checkConsul(),
 
 
         ];
 
+// dd($data);
         return view('bmi', compact('data'));
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\BMI  $bMI
-     * @return \Illuminate\Http\Response
-     */
-    public function show(BMI $bMI)
-    {
-        $bmi->delete();
-        return view();
-    }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\BMI  $bMI
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(BMI $bMI)
-    {
-        return view('bmi', compact('bmi'));
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\BMI  $bMI
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, BMI $bMI)
-    {
-        $bmi->update();
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\BMI  $bMI
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(BMI $bMI)
-    {
-        //
-    }
 }
 
 class hitung
@@ -110,7 +75,7 @@ class hitung
     }
 }
 
-class konsul extends hitung
+class statusbmi extends hitung
 {
     public function obes()
     {
@@ -124,5 +89,38 @@ class konsul extends hitung
             return 'tidak terdaftar';
         }
     }
+}
+
+// Parent Class
+class Umur
+{
+    // __construct runs whenever 'Age' and it's child class is called
+    public function __construct($yob, $bmihasil)
+    {
+        $this->yob = $yob;
+        $this->bmi = $bmihasil;
+    }
+
+    public function hitungUmur()
+    {
+        return 2022 - $this->yob;
+    }
+}
+
+class Konsul extends Umur
+{
+    public function checkConsul()
+    {
+        // Call parents method
+        $age = $this->hitungUmur();
+        // Condition
+        if ($age > 17 && $this->bmi > 30) {
+            return 'Anda bisa mendapatkan konsultasi gratis!';
+        } else {
+            return 'Tidak memenuhi syarat';
+        }
+    }
+
+
 }
 
